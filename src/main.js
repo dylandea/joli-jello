@@ -3,7 +3,7 @@ const ITEMS = [
         id: 247,
         name: "Jell-O Berry Blue",
         description: "Notre gelée la plus plébiscitée !",
-        img: "../public/images/blueberry.webp",
+        img: "./public/images/blueberry.webp",
         price: 2.25,
         quantity: 5,
         category: "blue"
@@ -12,7 +12,7 @@ const ITEMS = [
         id: 356,
         name: "Jell-O Cherry",
         description: "Le Jell-O de Saint Valentin à la cerise.",
-        img: "../public/images/cherry.webp",
+        img: "./public/images/cherry.webp",
         price: 1.99,
         quantity: 2,
         category: "red"
@@ -21,7 +21,7 @@ const ITEMS = [
         id: 645,
         name: "Jell-O Raspberry",
         description: "Le Jell-O trop rigolo !",
-        img: "../public/images/raspberry.webp",
+        img: "./public/images/raspberry.webp",
         price: 2,
         quantity: 0,
         category: "red"
@@ -246,7 +246,7 @@ function updateQuantity(itemId, newQty) {
 }
 
 function refreshBadgesAndCounters() {
-    let numOfItemsInBasket=0;
+   /*  let numOfItemsInBasket=0;
     if (basket.length > 0) {
         numOfItemsInBasket = basket.reduce(
             (acc, curr) => acc + curr.quantity,
@@ -255,11 +255,20 @@ function refreshBadgesAndCounters() {
     }
     //mettre à jour badge sur l'icone panier
     const counterBadge = document.querySelector("#counter-badge");
-    counterBadge.textContent = numOfItemsInBasket;
+    counterBadge.textContent = `${numOfItemsInBasket}` */
+
+
+    let numOfItemsInBasket = 0;
+    for (const value of basket) {
+        numOfItemsInBasket += +(value.quantity);
+    }
+    const counterBadge = document.querySelector("#counter-badge");
+    counterBadge.textContent = `${numOfItemsInBasket}`;
+
     //mettre à jour phrase quantité d'articles dans le panier
     basketItemsCounter.textContent = `${numOfItemsInBasket} ${
         numOfItemsInBasket < 2 ? "article, " : "articles, "
-    }`;
+    }`; 
     //mettre à jour le sous-total
     const subtotalDiv = document.querySelector("#subtotal");
     let totalPrice = 0;
