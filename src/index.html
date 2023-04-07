@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mon Joli Jell-O</title>
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="../public/images/favicon.ico"
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Delicious+Handrawn&display=swap"
+            rel="stylesheet"
+        />
+        <link href="/dist/output.css" rel="stylesheet" />
+        <script defer src="lodash.js"></script>
+        <script defer src="main.js"></script>
+
+    </head>
+    <body tabindex="-1">
+        <nav class="navbar">
+            <div class="navbar-start">
+                <div class="dropdown">
+                    <label tabindex="0" class="btn-ghost btn lg:hidden">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h8m-8 6h16"
+                            />
+                        </svg>
+                    </label>
+                    <ul
+                        tabindex="0"
+                        class="dropdown-content menu rounded-box menu-compact mt-3 w-52 bg-base-100 p-2 shadow"
+                    >
+                        <li>
+                            <a class="home-btn font-bold underline"
+                                >Toutes nos Jell-O</a
+                            >
+                        </li>
+                        <li><a class="blue-jello-btn">Les bleus</a></li>
+                        <li><a class="red-jello-btn">Les rouges</a></li>
+                    </ul>
+                </div>
+                <a
+                    id="logo"
+                    class="btn-ghost btn font-delicious text-2xl normal-case"
+                >
+                    <p
+                        class="bg-gradient-to-br from-red-600 to-green-400 bg-clip-text text-transparent"
+                    >
+                        Mon joli Jell-O
+                    </p>
+                </a>
+            </div>
+            <div class="navbar-center hidden lg:flex">
+                <ul class="menu menu-horizontal px-1">
+                    <li>
+                        <a class="home-btn font-bold underline"
+                            >Toutes nos Jell-O</a
+                        >
+                    </li>
+                    <li><a class="blue-jello-btn">Les bleus</a></li>
+                    <li><a class="red-jello-btn">Les rouges</a></li>
+                </ul>
+            </div>
+            <div class="navbar-end">
+                <div  class="dropdown dropdown-end">
+                    <label id="basket-label" tabindex="0" class="btn-ghost btn-circle btn">
+                        <div class="indicator">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                />
+                            </svg>
+                            <span
+                                id="counter-badge"
+                                class="badge badge-sm indicator-item"
+                                >0</span
+                            >
+                        </div>
+                    </label>
+                    <div
+                        tabindex="0"
+                        class="basket-preview card dropdown-content card-compact mt-3 w-52 bg-base-100 shadow md:w-auto"
+                    >
+                        <div class="card-body">
+                            <div class="w-full overflow-x-auto">
+                                <table id="basket-table" class="table w-full">
+                                    
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <span class="text-bold text-lg text-black inline w-52">
+                                <span
+                                    id="basket-items-counter"
+                                class="inline"
+                                    >0 article, </span
+                                >
+                                <span id="subtotal"
+                                class="inline"
+                                    >Total: 0€</span
+                                >
+                            </span>
+
+                            <div class="card-actions">
+                                <button id="buy-btn" class="btn-primary btn-block btn">
+                                    Acheter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="items-container" class="flex flex-row flex-wrap"></div>
+    </body>
+</html>
