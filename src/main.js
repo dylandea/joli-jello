@@ -1,10 +1,3 @@
-const USERS = [
-    {
-        email: "email",
-        password: "pw"
-    }
-];
-
 const ITEMS = [
     {
         id: 247,
@@ -41,36 +34,14 @@ const allNavButtons = document.querySelectorAll("nav li a");
 const basketElement = document.querySelector("#basket-label");
 const tableRef = document.getElementById("basket-table");
 const basketItemsCounter = document.querySelector("#basket-items-counter");
-const counterBadge = document.querySelector("#counter-badge");
 const buyBtn = document.querySelector("#buy-btn");
 
-//stringify and parse map in localeStorage
-function replacer(key, value) {
-    if (value instanceof Map) {
-        return {
-            dataType: "Map",
-            value: Array.from(value.entries()) // or with spread: value: [...value]
-        };
-    } else {
-        return value;
-    }
-}
-function reviver(key, value) {
-    if (typeof value === "object" && value !== null) {
-        if (value.dataType === "Map") {
-            return new Map(value.value);
-        }
-    }
-    return value;
-}
-let basket = new Map();
+let basket = new Array();
 if (window.localStorage.getItem("basket") != null) {
-    basket = JSON.parse(localStorage.getItem("basket"), reviver);
+    basket = JSON.parse(localStorage.getItem("basket"));
 }
 
-console.log(basket);
-generateCards(ITEMS);
-console.log(document.querySelector("#basket-table tbody").innerHTML);
+generateCards();
 generateBasket();
 refreshBadgesAndCounters();
 
@@ -102,19 +73,18 @@ function handleNavBtnClick(concernedElements) {
         element.classList.add("font-bold", "underline");
     }
     if (concernedElements[0].classList.contains("blue-jello-btn"))
-        generateCards(ITEMS, "blue");
+        generateCards("blue");
     else if (concernedElements[0].classList.contains("red-jello-btn"))
-        generateCards(ITEMS, "red");
-    else generateCards(ITEMS);
+        generateCards("red");
+    else generateCards();
 }
 
-function generateCards(items, category) {
-    itemsContainer.innerHTML = items
-        .filter(
-            (item) =>
-                item.category ===
-                (category !== undefined ? category : item.category)
-        )
+function generateCards(category) {
+    itemsContainer.innerHTML = ITEMS.filter(
+        (item) =>
+            item.category ===
+            (category !== undefined ? category : item.category)
+    )
         .map(
             (item) =>
                 `
@@ -152,11 +122,14 @@ function generateCards(items, category) {
 }
 
 function generateBasket() {
+    basket.length>0 ? buyBtn.disabled = false : buyBtn.disabled = true;
+    
     const myNode = document.querySelector("#basket-table tbody");
     while (myNode.firstChild) {
         myNode.removeChild(myNode.lastChild);
     }
-    for (const objectItem of basket.keys()) {
+    for (const item of basket) {
+        const objectItem = ITEMS.find((x) => x.id === item.id);
         myNode.insertAdjacentHTML(
             "beforeend",
             `
@@ -207,10 +180,11 @@ function generateBasket() {
                 ${new Intl.NumberFormat("fr-FR", {
                     style: "currency",
                     currency: "EUR"
-                }).format(objectItem.price * basket.get(objectItem))}
+                }).format(
+                    objectItem.price *
+                        basket.find((x) => x.id === item.id).quantity
+                )}
             </td>
-            
-            
             <td>
                 <button
                     class="btn-ghost btn-xs btn outline"
@@ -221,41 +195,19 @@ function generateBasket() {
             </td>
         </tr>`
         );
-
-        /*  const selectedVal = document.getElementById(
-                `select-${objectItem.id}`
-            ).selectedIndex; */
         document.getElementById(`select-${objectItem.id}`).selectedIndex =
-            basket.get(objectItem) - 1;
+            item.quantity - 1;
     }
     refreshBadgesAndCounters();
 }
 
 function addToBasket(itemId) {
-    const objectItem = ITEMS.find((x) => x.id === itemId);
-    let indexx = 0;
-    for (key of basket.keys()) {
-        if (_.isEqual(key, objectItem)) {
-            console.log(basket.get(key));
-            const oldval = basket.get(key);
-            basket.delete(key);
-            const arr = Array.from(basket);
-            console.log(arr.flat().toString());
-            arr.splice(indexx, 0, [objectItem, +oldval]);
-            console.log(arr.toString());
-            basket = new Map(arr);
-            break;
-        }
-        indexx++;
-    }
-
-    if (basket.has(objectItem)) {
-        console.log("hiiii");
-        const newQty = basket.get(objectItem) + 1;
+    const objectItem = basket.find((x) => x.id === itemId);
+    if (objectItem != undefined) {
+        const newQty = objectItem.quantity + 1;
 
         if (newQty < 11) {
-            console.log(typeof newQty);
-            basket.set(objectItem, newQty);
+            objectItem.quantity = newQty;
             const selectedVal = document.getElementById(
                 `select-${objectItem.id}`
             ).selectedIndex;
@@ -263,7 +215,7 @@ function addToBasket(itemId) {
                 newQty - 1;
         }
     } else {
-        basket.set(objectItem, 1);
+        basket.push({ id: itemId, quantity: 1 });
     }
 
     generateBasket();
@@ -272,30 +224,16 @@ function addToBasket(itemId) {
 
 function updateQuantity(itemId, newQty) {
     const objectItem = ITEMS.find((x) => x.id === itemId);
-    let indexx = 0;
-    for (key of basket.keys()) {
-        if (_.isEqual(key, objectItem)) {
-            console.log(basket.get(key));
-            const oldval = basket.get(key);
-            basket.delete(key);
-            const arr = Array.from(basket);
-            console.log(arr.flat().toString());
-            arr.splice(indexx, 0, [objectItem, +oldval]);
-            console.log(arr.toString());
-            basket = new Map(arr);
-            break;
-        }
-        indexx++;
-    }
+    const basketObject = basket.find((x) => x.id === itemId);
     if (newQty == 0) {
-        console.log(basket);
-        basket.delete(objectItem);
-        console.log(basket);
-        document.getElementById(`basket-tr-${objectItem.id}`).remove();
+        const indexToRemove = basket.findIndex((x) => x.id === itemId);
+        basket.splice(indexToRemove, 1);
+        document.getElementById(`basket-tr-${itemId}`).remove();
     } else {
-        basket.set(objectItem, newQty);
+        console.log(newQty);
+        basketObject.quantity = newQty;
         document.getElementById(`select-${objectItem.id}`).selectedIndex =
-            +newQty - 1;
+            newQty - 1;
         document.getElementById(
             `subtotal-${objectItem.id}`
         ).innerHTML = `${new Intl.NumberFormat("fr-FR", {
@@ -308,33 +246,37 @@ function updateQuantity(itemId, newQty) {
 }
 
 function refreshBadgesAndCounters() {
-    //mettre à jour badge sur l'icone panier
-    let totalArticles = 0;
-    for (const value of basket.values()) {
-        totalArticles += +value;
+    let numOfItemsInBasket=0;
+    if (basket.length > 0) {
+        numOfItemsInBasket = basket.reduce(
+            (acc, curr) => acc + curr.quantity,
+            0
+        );
     }
-    counterBadge.textContent = `${totalArticles}`;
+    //mettre à jour badge sur l'icone panier
+    const counterBadge = document.querySelector("#counter-badge");
+    counterBadge.textContent = numOfItemsInBasket;
     //mettre à jour phrase quantité d'articles dans le panier
-    basketItemsCounter.textContent = `${totalArticles} ${
-        totalArticles < 2 ? "article, " : "articles, "
+    basketItemsCounter.textContent = `${numOfItemsInBasket} ${
+        numOfItemsInBasket < 2 ? "article, " : "articles, "
     }`;
     //mettre à jour le sous-total
     const subtotalDiv = document.querySelector("#subtotal");
-    let subtotal = 0;
-    for (const item of basket.keys()) {
-        subtotal += item.price * basket.get(item);
+    let totalPrice = 0;
+    for (const item of basket) {
+        const objectItem = ITEMS.find((x) => x.id === item.id);
+        totalPrice += objectItem.price * item.quantity;
     }
     //ça ou .toFixed(2) ou tout stocker en centimes puis /100 pour la vraie somme. Mais ne pas utiliser de float
     subtotalDiv.textContent = `Total: ${new Intl.NumberFormat("fr-FR", {
         style: "currency",
         currency: "EUR"
-    }).format(subtotal)}`; //textContent ? meilleure manière TODO ?
+    }).format(totalPrice)}`;
 
-    window.localStorage.setItem("basket", JSON.stringify(basket, replacer));
+    window.localStorage.setItem("basket", JSON.stringify(basket));
 }
 
 function validateCart() {
-    console.log("validateCart() called");
     document.activeElement.blur();
     for (element of allNavButtons) {
         element.classList.remove("font-bold", "underline");
@@ -407,5 +349,10 @@ function validateCart() {
 }
 
 function confirmOrderValidated() {
-    itemsContainer.innerHTML = `<h5 class="mx-auto mt-56 underline text-xl">Félicitations votre commande a été validée<h5>`
+    basket.length=0;
+    generateBasket();
+refreshBadgesAndCounters();
+    itemsContainer.innerHTML = `<div class="mx-auto mt-56"><div class="mx-auto text-xl">Félicitations votre commande a été validée !</div> <div class="mx-auto text-sm">Vous allez bientôt recevoir un email.</div>
+    <button onclick="handleNavBtnClick(homeButtons)" type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mx-auto">Revenir dans la boutique</button>
+  </div>`;
 }
